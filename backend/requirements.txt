@@ -1,0 +1,17 @@
+# FluentAI Backend Dependencies
+fastapi
+email-validator
+uvicorn[standard]
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+mysql-connector-python
+pydantic
+pydantic-settings
+openai
+google-generativeai
+python-dotenv
+cryptography
+reportlab
+aiofiles
+httpx
