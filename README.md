@@ -1,6 +1,5 @@
 # FluentAI - AI-Powered Language Learning Platform
 
-A Duolingo-style English learning web application with AI-powered speaking practice, adaptive curriculum, and personalized learning paths.
 
 ## Features
 
@@ -85,10 +84,6 @@ Get your API keys from:
 - OpenAI: https://platform.openai.com/api-keys
 - Google AI: https://makersuite.google.com/app/apikey
 
-## Default Admin Account
-
-- Email: admin@fluentai.com
-- Password: admin123
 
 ## Project Structure
 
@@ -160,4 +155,5 @@ This project was created for educational purposes.
 
 1. Nisa Atım
 2. Selinay Levat
+
 
