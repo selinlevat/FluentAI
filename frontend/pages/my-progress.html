@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Progress - FluentAI</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/themes.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="dashboard.html" class="logo">
+                    <span class="logo-icon">🎓</span>
+                    <span class="logo-text">FluentAI</span>
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <a href="dashboard.html" class="nav-item">
+                        <span class="icon">🏠</span>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="my-progress.html" class="nav-item active">
+                        <span class="icon">📊</span>
+                        <span>My Progress</span>
+                    </a>
+                    <a href="settings.html" class="nav-item">
+                        <span class="icon">⚙️</span>
+                        <span>Settings</span>
+                    </a>
+                </div>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="#" class="nav-item" data-action="logout">
+                    <span class="icon">🚪</span>
+                    <span>Log Out</span>
+                </a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="top-bar">
+                <div class="page-title">
+                    <h1>My Progress</h1>
+                </div>
+                <button class="btn btn-secondary" onclick="downloadReport()">
+                    📄 Download Report
+                </button>
+            </div>
+
+            <div
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                <div class="stat-card">
+                    <div class="icon">🏆</div>
+                    <div>
+                        <div class="stat-value" id="total-xp">0</div>
+                        <div class="stat-label">Total XP</div>
+                    </div>
+                </div>
+                <div class="stat-card streak">
+                    <div class="icon">🔥</div>
+                    <div>
+                        <div class="stat-value" id="current-streak">0</div>
+                        <div class="stat-label">Day Streak</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon">📚</div>
+                    <div>
+                        <div class="stat-value" id="lessons-completed">0</div>
+                        <div class="stat-label">Lessons Done</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon">⭐</div>
+                    <div>
+                        <div class="stat-value" id="current-level">A1</div>
+                        <div class="stat-label">Current Level</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem;">
+                <div>
+                    <!-- Skills Card -->
+                    <div class="card" style="margin-bottom: 1.5rem;">
+                        <h3 style="margin-bottom: 1.5rem;">Skill Progress</h3>
+                        <div class="skill-bars" id="skill-progress">
+                            <div class="skeleton" style="height: 24px; margin-bottom: 0.75rem;"></div>
+                            <div class="skeleton" style="height: 24px; margin-bottom: 0.75rem;"></div>
+                            <div class="skeleton" style="height: 24px; margin-bottom: 0.75rem;"></div>
+                            <div class="skeleton" style="height: 24px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Weekly Activity -->
+                    <div class="card">
+                        <h3 style="margin-bottom: 1.5rem;">Weekly Activity</h3>
+                        <div class="weekly-chart" id="weekly-activity" style="height: 150px;">
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <!-- Achievements Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Achievements</h3>
+                            <span id="achievements-count">0/12</span>
+                        </div>
+                        <div id="achievements-grid"
+                            style="display: grid; gap: 0.5rem; max-height: 500px; overflow-y: auto; padding-right: 5px;">
+                            <div class="skeleton" style="height: 60px;"></div>
+                            <div class="skeleton" style="height: 60px;"></div>
+                            <div class="skeleton" style="height: 60px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { api } from '../js/api.js';
+        import { toast, loading, checkAuth, initSidebar, formatNumber } from '../js/app.js';
+
+        if (!checkAuth()) {
+            window.location.href = 'login.html';
+        }
+
+        initSidebar();
+
+        async function loadProgress() {
+            try {
+                const [dashboard, achievements] = await Promise.all([
+                    api.getDashboard(),
+                    api.getAchievements()
+                ]);
+
+                // Stats
+                document.getElementById('total-xp').textContent = formatNumber(dashboard.xp_total);
+                document.getElementById('current-streak').textContent = dashboard.current_streak;
+                document.getElementById('lessons-completed').textContent = dashboard.total_lessons_completed || 0;
+                document.getElementById('current-level').textContent = dashboard.cefr_level;
+
+                // Skills
+                renderSkills(dashboard.skill_breakdown);
+
+                // Weekly
+                renderWeekly(dashboard.weekly_progress);
+
+                // Achievements
+                renderAchievements(achievements);
+
+            } catch (error) {
+                toast.error('Failed to load progress');
+            }
+        }
+
+        function renderSkills(skills) {
+            const container = document.getElementById('skill-progress');
+            if (!skills || skills.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted);">Complete lessons to see skill progress</p>';
+                return;
+            }
+
+            container.innerHTML = skills.map(skill => `
+                <div class="skill-bar-item">
+                    <span class="skill-name" style="text-transform: capitalize;">${skill.skill}</span>
+                    <div class="skill-bar">
+                        <div class="skill-bar-fill ${skill.skill}" style="width: ${skill.level}%;"></div>
+                    </div>
+                    <span class="skill-percent">${skill.level}%</span>
+                </div>
+            `).join('');
+        }
+
+        function renderWeekly(weekly) {
+            const container = document.getElementById('weekly-activity');
+            if (!weekly) return;
+
+            const maxXP = Math.max(...weekly.map(d => d.xp_earned), 50);
+
+            container.innerHTML = weekly.map((day, i) => {
+                const height = (day.xp_earned / maxXP) * 100;
+                const isToday = i === weekly.length - 1;
+
+                return `
+                    <div class="chart-bar ${day.active ? 'active' : ''} ${isToday ? 'today' : ''}">
+                        <div class="bar" style="height: 100px;">
+                            <div class="fill" style="height: ${height}px;"></div>
+                        </div>
+                        <span class="day">${day.day}</span>
+                        <span style="font-size: 0.7rem; color: var(--text-muted);">${day.xp_earned} XP</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderAchievements(data) {
+            const container = document.getElementById('achievements-grid');
+            document.getElementById('achievements-count').textContent =
+                `${data.total_earned}/${data.total_available}`;
+
+            container.innerHTML = data.achievements.map(a => `
+                <div class="achievement-card ${a.earned ? '' : 'locked'}">
+                    <span class="achievement-icon">${a.icon}</span>
+                    <div class="achievement-info">
+                        <h4>${a.name}</h4>
+                        <p>${a.description}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.downloadReport = function () {
+            api.downloadReport();
+        };
+
+        loadProgress();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Management - FluentAI</title>
+    <link rel="stylesheet" href="../../css/main.css">
+    <link rel="stylesheet" href="../../css/components.css">
+    <link rel="stylesheet" href="../../css/themes.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="../dashboard.html" class="logo">
+                    <span class="logo-icon">🎓</span>
+                    <span class="logo-text">FluentAI</span>
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Admin</div>
+                    <a href="dashboard.html" class="nav-item">
+                        <span class="icon">📊</span>
+                        <span>Statistics</span>
+                    </a>
+                    <a href="content.html" class="nav-item active">
+                        <span class="icon">📝</span>
+                        <span>Content</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <a href="../dashboard.html" class="nav-item">
+                        <span class="icon">🏠</span>
+                        <span>Back to App</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+        
+        <main class="main-content">
+            <div class="top-bar">
+                <div class="page-title">
+                    <h1>📝 Content Management</h1>
+                </div>
+            </div>
+            
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('packs')">Lesson Packs</button>
+                <button class="tab" onclick="switchTab('lessons')">Lessons</button>
+                <button class="tab" onclick="switchTab('questions')">Questions</button>
+            </div>
+            
+            <!-- Lesson Packs Tab -->
+            <div id="packs-tab" class="tab-content">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h3>Lesson Packs</h3>
+                    <button class="btn btn-primary" onclick="showAddModal('lesson_pack')">+ Add Pack</button>
+                </div>
+                <div id="packs-list">
+                    <div class="skeleton" style="height: 60px; margin-bottom: 0.5rem;"></div>
+                    <div class="skeleton" style="height: 60px; margin-bottom: 0.5rem;"></div>
+                </div>
+            </div>
+            
+            <!-- Lessons Tab -->
+            <div id="lessons-tab" class="tab-content" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h3>Lessons</h3>
+                    <button class="btn btn-primary" onclick="showAddModal('lesson')">+ Add Lesson</button>
+                </div>
+                <div id="lessons-list">
+                    <div class="skeleton" style="height: 60px; margin-bottom: 0.5rem;"></div>
+                </div>
+            </div>
+            
+            <!-- Questions Tab -->
+            <div id="questions-tab" class="tab-content" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h3>Questions</h3>
+                    <button class="btn btn-primary" onclick="showAddModal('question')">+ Add Question</button>
+                </div>
+                <div id="questions-list">
+                    <div class="skeleton" style="height: 60px; margin-bottom: 0.5rem;"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Add/Edit Modal -->
+    <div class="modal-overlay" id="content-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">Add Content</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-content" id="modal-form">
+                <!-- Dynamic form content -->
+            </div>
+        </div>
+    </div>
+    
+    <script type="module">
+        import { api } from '../../js/api.js';
+        import { toast, checkAuth, loading } from '../../js/app.js';
+        
+        if (!checkAuth()) {
+            window.location.href = '../login.html';
+        }
+        
+        const user = api.getUser();
+        if (user && user.role !== 'admin') {
+            window.location.href = '../dashboard.html';
+        }
+        
+        let content = { lesson_packs: [], lessons: [], questions: [] };
+        
+        async function loadContent() {
+            try {
+                content = await api.getAdminContent();
+                renderPacks();
+                renderLessons();
+                renderQuestions();
+            } catch (error) {
+                toast.error('Failed to load content');
+            }
+        }
+        
+        function renderPacks() {
+            const container = document.getElementById('packs-list');
+            if (content.lesson_packs.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted);">No lesson packs yet</p>';
+                return;
+            }
+            
+            container.innerHTML = content.lesson_packs.map(pack => `
+                <div class="card" style="padding: 1rem; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong>${pack.icon || '📚'} ${pack.title}</strong>
+                        <span class="level-badge ${(pack.cefr_level || '').toLowerCase()}" style="margin-left: 0.5rem;">${pack.cefr_level}</span>
+                        <p style="font-size: 0.875rem; color: var(--text-muted); margin-top: 0.25rem;">${pack.description || ''}</p>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-ghost btn-sm" onclick="editItem('lesson_pack', ${pack.id})">Edit</button>
+                        <button class="btn btn-ghost btn-sm" style="color: var(--error);" onclick="deleteItem('lesson_pack', ${pack.id})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function renderLessons() {
+            const container = document.getElementById('lessons-list');
+            if (content.lessons.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted);">No lessons yet</p>';
+                return;
+            }
+            
+            container.innerHTML = content.lessons.map(lesson => `
+                <div class="card" style="padding: 1rem; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong>${lesson.title}</strong>
+                        <span style="margin-left: 0.5rem; font-size: 0.75rem; color: var(--text-muted);">${lesson.type}</span>
+                        <p style="font-size: 0.875rem; color: var(--text-muted);">${lesson.pack_title || 'No pack'} • ${lesson.cefr_level} • ${lesson.xp_reward} XP</p>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-ghost btn-sm" onclick="editItem('lesson', ${lesson.id})">Edit</button>
+                        <button class="btn btn-ghost btn-sm" style="color: var(--error);" onclick="deleteItem('lesson', ${lesson.id})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function renderQuestions() {
+            const container = document.getElementById('questions-list');
+            if (content.questions.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted);">No questions yet</p>';
+                return;
+            }
+            
+            container.innerHTML = content.questions.slice(0, 50).map(q => `
+                <div class="card" style="padding: 1rem; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong>${q.type}</strong> - ${q.skill_tag}
+                        <p style="font-size: 0.875rem; color: var(--text-muted);">${q.content?.question || q.content?.sentence || 'Question'}</p>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-ghost btn-sm" onclick="editItem('question', ${q.id})">Edit</button>
+                        <button class="btn btn-ghost btn-sm" style="color: var(--error);" onclick="deleteItem('question', ${q.id})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        window.switchTab = function(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+            
+            event.target.classList.add('active');
+            document.getElementById(`${tab}-tab`).style.display = 'block';
+        };
+        
+        window.showAddModal = function(type) {
+            const modal = document.getElementById('content-modal');
+            document.getElementById('modal-title').textContent = `Add ${type.replace('_', ' ')}`;
+            
+            let formHtml = '';
+            if (type === 'lesson_pack') {
+                formHtml = `
+                    <form onsubmit="saveContent(event, 'lesson_pack')">
+                        <div class="form-group">
+                            <label class="form-label">Title</label>
+                            <input type="text" id="pack-title" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Description</label>
+                            <textarea id="pack-description" class="form-input" rows="2"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">CEFR Level</label>
+                            <select id="pack-level" class="form-input">
+                                <option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option><option>C2</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Icon (emoji)</label>
+                            <input type="text" id="pack-icon" class="form-input" value="📚">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </form>
+                `;
+            } else if (type === 'lesson') {
+                const packOptions = content.lesson_packs.map(p => `<option value="${p.id}">${p.title}</option>`).join('');
+                formHtml = `
+                    <form onsubmit="saveContent(event, 'lesson')">
+                        <div class="form-group">
+                            <label class="form-label">Title</label>
+                            <input type="text" id="lesson-title" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Pack</label>
+                            <select id="lesson-pack" class="form-input">
+                                <option value="">No pack</option>
+                                ${packOptions}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Type</label>
+                            <select id="lesson-type" class="form-input">
+                                <option value="daily">Daily</option>
+                                <option value="grammar_sprint">Grammar Sprint</option>
+                                <option value="word_sprint">Word Sprint</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">CEFR Level</label>
+                            <select id="lesson-level" class="form-input">
+                                <option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">XP Reward</label>
+                            <input type="number" id="lesson-xp" class="form-input" value="50">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </form>
+                `;
+            } else if (type === 'question') {
+                const lessonOptions = content.lessons.map(l => `<option value="${l.id}">${l.title}</option>`).join('');
+                formHtml = `
+                    <form onsubmit="saveContent(event, 'question')">
+                        <div class="form-group">
+                            <label class="form-label">Lesson</label>
+                            <select id="question-lesson" class="form-input">${lessonOptions}</select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Type</label>
+                            <select id="question-type" class="form-input">
+                                <option value="mcq">Multiple Choice</option>
+                                <option value="gap_fill">Gap Fill</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Skill</label>
+                            <select id="question-skill" class="form-input">
+                                <option value="grammar">Grammar</option>
+                                <option value="vocabulary">Vocabulary</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Question Text</label>
+                            <input type="text" id="question-text" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Options (comma separated)</label>
+                            <input type="text" id="question-options" class="form-input" placeholder="option1, option2, option3, option4">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Correct Answer</label>
+                            <input type="text" id="question-answer" class="form-input" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </form>
+                `;
+            }
+            
+            document.getElementById('modal-form').innerHTML = formHtml;
+            modal.classList.add('active');
+        };
+        
+        window.closeModal = function() {
+            document.getElementById('content-modal').classList.remove('active');
+        };
+        
+        window.saveContent = async function(event, type) {
+            event.preventDefault();
+            
+            let data = {};
+            if (type === 'lesson_pack') {
+                data = {
+                    title: document.getElementById('pack-title').value,
+                    description: document.getElementById('pack-description').value,
+                    cefr_level: document.getElementById('pack-level').value,
+                    icon: document.getElementById('pack-icon').value
+                };
+            } else if (type === 'lesson') {
+                data = {
+                    title: document.getElementById('lesson-title').value,
+                    pack_id: document.getElementById('lesson-pack').value || null,
+                    type: document.getElementById('lesson-type').value,
+                    cefr_level: document.getElementById('lesson-level').value,
+                    xp_reward: parseInt(document.getElementById('lesson-xp').value)
+                };
+            } else if (type === 'question') {
+                const options = document.getElementById('question-options').value.split(',').map(o => o.trim());
+                data = {
+                    lesson_id: parseInt(document.getElementById('question-lesson').value),
+                    type: document.getElementById('question-type').value,
+                    skill_tag: document.getElementById('question-skill').value,
+                    content: {
+                        question: document.getElementById('question-text').value,
+                        options: options
+                    },
+                    correct_answer: document.getElementById('question-answer').value
+                };
+            }
+            
+            try {
+                await api.createContent(type, data);
+                toast.success('Content created!');
+                closeModal();
+                loadContent();
+            } catch (error) {
+                toast.error('Failed to create content');
+            }
+        };
+        
+        window.deleteItem = async function(type, id) {
+            if (!confirm('Are you sure you want to delete this?')) return;
+            
+            try {
+                await api.deleteContent(type, id);
+                toast.success('Deleted!');
+                loadContent();
+            } catch (error) {
+                toast.error('Failed to delete');
+            }
+        };
+        
+        window.editItem = function(type, id) {
+            toast.info('Edit functionality coming soon!');
+        };
+        
+        loadContent();
+    </script>
+</body>
+</html>

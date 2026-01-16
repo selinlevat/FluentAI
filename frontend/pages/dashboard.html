@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - FluentAI</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/themes.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="dashboard.html" class="logo">
+                    <span class="logo-text">🎓 FluentAI</span>
+                </a>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Learn</div>
+                    <a href="dashboard.html" class="nav-item active">
+                        <span class="icon">🏠</span>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="daily-lesson.html" class="nav-item">
+                        <span class="icon">📚</span>
+                        <span>Daily Lesson</span>
+                    </a>
+                    <a href="grammar-sprint.html" class="nav-item">
+                        <span class="icon">⚡</span>
+                        <span>Grammar Sprint</span>
+                    </a>
+                    <a href="word-sprint.html" class="nav-item">
+                        <span class="icon">📝</span>
+                        <span>Word Sprint+</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Practice</div>
+                    <a href="prepare-me.html" class="nav-item">
+                        <span class="icon">🎭</span>
+                        <span>Prepare Me</span>
+                    </a>
+                    <a href="talk-loop.html" class="nav-item">
+                        <span class="icon">💬</span>
+                        <span>Talk Loop</span>
+                    </a>
+                    <a href="review-mode.html" class="nav-item">
+                        <span class="icon">🔄</span>
+                        <span>Review Mode</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Progress</div>
+                    <a href="my-progress.html" class="nav-item">
+                        <span class="icon">📊</span>
+                        <span>My Progress</span>
+                    </a>
+                    <a href="settings.html" class="nav-item">
+                        <span class="icon">⚙️</span>
+                        <span>Settings</span>
+                    </a>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <a href="#" class="nav-item" data-action="logout">
+                    <span class="icon">🚪</span>
+                    <span>Log Out</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content" id="dashboard-main">
+            <div class="top-bar">
+                <div class="page-title">
+                    <h1>Dashboard</h1>
+                </div>
+            </div>
+
+            <!-- Stats Overview removed -->
+
+            <div class="dashboard-grid">
+                <div class="dashboard-main">
+                    <!-- Daily Goal -->
+                    <div class="daily-goal">
+                        <div class="daily-goal-header">
+                            <h3>Today's Goal</h3>
+                            <span id="goal-status">In Progress</span>
+                        </div>
+                        <div class="daily-goal-progress">
+                            <div class="progress-bar lg">
+                                <div class="progress-fill" id="goal-progress" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="daily-goal-stats">
+                            <span id="goal-xp">0/50 XP</span>
+                            <span>Complete a lesson to reach your goal!</span>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="card" style="padding: 2.5rem;">
+                        <div class="card-header">
+                            <h3 class="card-title" style="font-size: 1.5rem;">Quick Start</h3>
+                        </div>
+                        <div
+                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                            <a href="daily-lesson.html" class="btn btn-primary"
+                                style="padding: 2rem; font-size: 1.25rem; height: 100%; display: flex; align-items: center; justify-content: center; text-decoration: none;">
+                                📚 Daily Lesson
+                            </a>
+                            <a href="grammar-sprint.html" class="btn btn-secondary"
+                                style="padding: 2rem; font-size: 1.25rem; height: 100%; display: flex; align-items: center; justify-content: center; text-decoration: none;">
+                                ⚡ Grammar Sprint
+                            </a>
+                            <a href="word-sprint.html" class="btn btn-secondary"
+                                style="padding: 2rem; font-size: 1.25rem; height: 100%; display: flex; align-items: center; justify-content: center; text-decoration: none;">
+                                📝 Word Sprint
+                            </a>
+                            <a href="prepare-me.html" class="btn btn-accent"
+                                style="padding: 2rem; font-size: 1.25rem; height: 100%; display: flex; align-items: center; justify-content: center; text-decoration: none;">
+                                🎭 Prepare Me
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Weekly Progress removed -->
+
+                    <!-- Lesson Packs removed -->
+                </div>
+
+                <div class="dashboard-sidebar">
+                    <!-- Level Progress removed -->
+
+                    <!-- Skills -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Skills</h3>
+                        </div>
+                        <div class="skills-badges">
+                            <div class="skill-badge-item">
+                                <div class="circular-progress" id="daily-xp-badge" data-progress="0">
+                                    <svg viewBox="0 0 100 100">
+                                        <circle class="progress-bg" cx="50" cy="50" r="45" />
+                                        <circle class="progress-bar" cx="50" cy="50" r="45" />
+                                    </svg>
+                                    <div class="progress-value">0%</div>
+                                </div>
+                                <p class="badge-label">Daily XP</p>
+                            </div>
+                            <div class="skill-badge-item">
+                                <div class="circular-progress" id="grammar-badge" data-progress="0">
+                                    <svg viewBox="0 0 100 100">
+                                        <circle class="progress-bg" cx="50" cy="50" r="45" />
+                                        <circle class="progress-bar" cx="50" cy="50" r="45" />
+                                    </svg>
+                                    <div class="progress-value">0%</div>
+                                </div>
+                                <p class="badge-label">Grammar Sprint</p>
+                            </div>
+                            <div class="skill-badge-item">
+                                <div class="circular-progress" id="word-badge" data-progress="0">
+                                    <svg viewBox="0 0 100 100">
+                                        <circle class="progress-bg" cx="50" cy="50" r="45" />
+                                        <circle class="progress-bar" cx="50" cy="50" r="45" />
+                                    </svg>
+                                    <div class="progress-value">0%</div>
+                                </div>
+                                <p class="badge-label">Word Sprint+</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vocabulary removed -->
+
+                    <!-- Achievements -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Recent Achievements</h3>
+                        </div>
+                        <div id="achievements-list" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <p style="color: var(--text-muted); font-size: 0.875rem;">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { api } from '../js/api.js?v=fix1';
+        import { initSidebar, checkAuth } from '../js/app.js?v=fix1';
+        import { initDashboard, loadLessonPacks } from '../js/dashboard.js?v=fix1';
+
+        // Quick Start button functions
+        window.startDailyLesson = function () {
+            window.location.href = 'daily-lesson.html';
+        };
+
+        window.startGrammarSprint = function () {
+            window.location.href = 'grammar-sprint.html';
+        };
+
+        window.startWordSprint = function () {
+            window.location.href = 'word-sprint.html';
+        };
+
+        window.startSpeaking = function () {
+            window.location.href = 'prepare-me.html';
+        };
+
+        if (!checkAuth()) {
+            window.location.href = 'login.html';
+        } else {
+            initSidebar();
+
+            // Load dashboard data from API (includes CEFR level)
+            initDashboard();
+            loadLessonPacks();
+        }
+    </script>
+</body>
+
+</html>

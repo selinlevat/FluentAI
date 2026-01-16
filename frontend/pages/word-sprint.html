@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Sprint+ - FluentAI</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/themes.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="lesson-page">
+        <div class="lesson-header">
+            <a href="dashboard.html" class="lesson-back">
+                ← Back
+            </a>
+            <div class="lesson-info">
+                <h2>📝 Word Sprint+</h2>
+                <p style="color: var(--text-muted);"> Answer as careful as you can!</p>
+            </div>
+            <div class="timer">
+                ⏱️ <span id="timer">0:30</span>
+            </div>
+        </div>
+
+        <div class="lesson-progress-bar">
+            <div class="progress-bar lg">
+                <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <div id="lesson-container">
+            <div style="text-align: center; padding: 3rem;">
+                <div class="loading-spinner" style="margin: 0 auto;"></div>
+                <p style="margin-top: 1rem; color: var(--text-muted);">Loading vocabulary challenge...</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { checkAuth } from '../js/app.js?v=timer_fix';
+        import { initLesson } from '../js/lessons.js?v=timer_fix';
+
+        if (!checkAuth()) {
+            window.location.href = 'login.html';
+        } else {
+            initLesson('word-sprint');
+        }
+    </script>
+</body>
+
+</html>

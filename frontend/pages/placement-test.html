@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Placement Test - FluentAI</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/themes.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <style>
+        .result-screen {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .intro-layout {
+            display: flex;
+            align-items: center;
+            gap: 4rem;
+            text-align: left;
+        }
+
+        .intro-content {
+            flex: 1;
+        }
+
+        .intro-image {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+        }
+
+        .intro-image img {
+            max-width: 100%;
+            height: auto;
+            max-height: 400px;
+        }
+
+        /* Mobile adjustments removed by user request */
+    </style>
+</head>
+
+<body>
+    <div class="lesson-page">
+        <!-- Header removed -->
+        <div style="height: 20px;"></div>
+
+        <div class="lesson-progress-bar">
+            <div class="progress-bar lg">
+                <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <div id="test-container">
+            <!-- Intro Screen -->
+            <!-- Intro Screen -->
+            <div class="result-screen" id="intro-screen"
+                style="max-width: 800px; margin: 0 auto; padding: 2rem; text-align: center;">
+                <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">Welcome to Your Placement Test!</h2>
+                <p
+                    style="color: var(--text-muted); font-size: 1.1rem; margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+                    This test will determine your current English level (A1-C2) and create a
+                    personalized learning path just for you.
+                </p>
+
+                <div
+                    style="background: var(--bg-secondary); border-radius: var(--radius-xl); padding: 2rem; margin-bottom: 2rem; max-width: 450px; margin-left: auto; margin-right: auto; text-align: left;">
+                    <h4 style="margin-bottom: 1rem; font-size: 1.1rem;">Test Details:</h4>
+                    <ul
+                        style="color: var(--text-secondary); font-size: 0.95rem; display: flex; flex-direction: column; gap: 0.5rem; padding-left: 1.2rem;">
+                        <li>15 questions covering grammar and vocabulary</li>
+                        <li>Questions get progressively harder</li>
+                        <li>Takes about 5-10 minutes</li>
+                        <li>No time limit - take your time!</li>
+                    </ul>
+                </div>
+
+                <button class="btn btn-primary btn-lg" onclick="startTest()" style="min-width: 200px;">
+                    Start Test
+                </button>
+            </div>
+
+            <!-- Questions will be rendered here -->
+            <div id="question-area" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { api } from '../js/api.js';
+        import { toast, loading, QuestionRenderer, checkAuth } from '../js/app.js?v=remove_xp';
+
+        if (!checkAuth()) {
+            window.location.href = 'login.html';
+        }
+
+        let questions = [];
+        let currentIndex = 0;
+        let answers = [];
+        let questionRenderer = null;
+
+        window.startTest = async function () {
+            document.getElementById('intro-screen').style.display = 'none';
+            document.getElementById('question-area').style.display = 'block';
+
+            loading.show();
+
+            try {
+                const data = await api.getPlacementTest();
+                questions = data.questions;
+
+                if (data.already_completed) {
+                    // Already has a level
+                    showAlreadyCompleted(data.current_level);
+                    return;
+                }
+
+                questionRenderer = new QuestionRenderer(document.getElementById('question-area'));
+                renderQuestion();
+
+            } catch (error) {
+                toast.error('Failed to load test');
+            } finally {
+                loading.hide();
+            }
+        };
+
+        function showAlreadyCompleted(level) {
+            document.getElementById('test-container').innerHTML = `
+                <div class="result-screen">
+                    <h2>Assessment Complete!</h2>
+                    <p style="margin-bottom: 2rem;">You've already been placed at level:</p>
+                    <div class="level-badge" style="width: 80px; height: 80px; font-size: 1.5rem; margin: 0 auto 2rem;">${level}</div>
+                    <a href="dashboard.html" class="btn btn-primary">Go to Dashboard</a>
+                </div>
+            `;
+        }
+
+        function renderQuestion() {
+            if (currentIndex >= questions.length) {
+                submitTest();
+                return;
+            }
+
+            const question = questions[currentIndex];
+            questionRenderer.render(question, currentIndex, questions.length, null);
+
+            // Update progress
+            const progress = (currentIndex / questions.length) * 100;
+            document.getElementById('progress-fill').style.width = `${progress}%`;
+        }
+
+        window.handleAnswer = function (answer) {
+            const question = questions[currentIndex];
+            questionRenderer.selectAnswer(answer);
+
+            answers.push({
+                question_id: question.id,
+                user_answer: answer
+            });
+
+            // Get correct answer
+            let correctAnswer = question.correct_answer;
+            if (typeof correctAnswer === 'string') {
+                try { correctAnswer = JSON.parse(correctAnswer); } catch { }
+            }
+
+            const isCorrect = String(answer).toLowerCase() === String(correctAnswer).toLowerCase();
+            questionRenderer.showResult(isCorrect, correctAnswer);
+
+            setTimeout(() => {
+                currentIndex++;
+                renderQuestion();
+            }, 1000);
+        };
+
+        async function submitTest() {
+            loading.show();
+
+            try {
+                const result = await api.submitPlacementTest(answers);
+                showResults(result);
+            } catch (error) {
+                console.error("Submission error:", error);
+                // Try to show specific error message from backend
+                const msg = error.message || error.detail || 'Failed to submit test';
+                toast.error(msg);
+                alert("Debug Error: " + msg); // Aggressive alert to ensure user sees it
+            } finally {
+                loading.hide();
+            }
+        }
+
+        function showResults(result) {
+            document.getElementById('test-container').innerHTML = `
+                <div class="result-screen">
+                    <h2>Test Complete!</h2>
+                    <p style="color: var(--text-muted); margin-bottom: 1.5rem;">${result.message}</p>
+                    
+                    <div class="level-badge" style="width: 100px; height: 100px; font-size: 2rem; margin: 0 auto 2rem;">
+                        ${result.assigned_level}
+                    </div>
+                    
+                    <div class="result-stats" style="margin-bottom: 2rem;">
+                        <div class="result-stat">
+                            <div class="result-stat-value">${result.correct_answers}/${result.total_questions}</div>
+                            <div class="result-stat-label">Correct</div>
+                        </div>
+                        <div class="result-stat">
+                            <div class="result-stat-value">${result.score_percentage}%</div>
+                            <div class="result-stat-label">Score</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: var(--bg-secondary); border-radius: var(--radius-xl); padding: 1.5rem; margin-bottom: 2rem; max-width: 500px; margin-left: auto; margin-right: auto;">
+                        <h4 style="margin-bottom: 1rem;">Skill Breakdown</h4>
+                        <div class="skill-bars">
+                            ${result.skill_breakdown.map(skill => `
+                                <div class="skill-bar-item">
+                                    <span class="skill-name">${skill.skill}</span>
+                                    <div class="skill-bar">
+                                        <div class="skill-bar-fill ${skill.skill}" style="width: ${skill.score}%;"></div>
+                                    </div>
+                                    <span class="skill-percent">${skill.score}%</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <a href="dashboard.html" class="btn btn-primary btn-lg">
+                        Start Learning! →
+                    </a>
+                </div>
+            `;
+
+            document.getElementById('progress-fill').style.width = '100%';
+
+            // Update user in localStorage
+            const user = api.getUser();
+            if (user) {
+                user.cefr_level = result.assigned_level;
+                api.setUser(user);
+            }
+        }
+    </script>
+</body>
+
+</html>

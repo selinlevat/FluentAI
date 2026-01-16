@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Talk Loop - Free Talk - FluentAI</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/themes.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .start-screen {
+            text-align: center;
+            padding: 0 3rem 3rem 3rem;
+        }
+
+        .start-icon {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .conversation-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .session-stats {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .input-area {
+            margin-top: 1.5rem;
+        }
+
+        .mic-area {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .text-input-area {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .text-input-area input {
+            flex: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="lesson-page" style="display: flex; flex-direction: column; min-height: 100vh;">
+        <div class="lesson-header" style="justify-content: flex-start;">
+            <a href="dashboard.html" class="lesson-back">
+                ← Back
+            </a>
+        </div>
+
+        <div id="freetalk-container" style="flex: 1; display: flex; justify-content: center;">
+            <div class="start-screen">
+                <div class="start-icon">💬</div>
+                <h2>Free Talk Mode</h2>
+                <p
+                    style="color: var(--text-muted); margin-bottom: 2rem; max-width: 400px; margin-left: auto; margin-right: auto;">
+                    Practice speaking with an AI partner. Talk about anything you want -
+                    your day, your interests, or practice specific topics.
+                </p>
+
+                <div
+                    style="background: var(--bg-secondary); border-radius: var(--radius-xl); padding: 1.5rem; margin-bottom: 2rem; max-width: 400px; margin-left: auto; margin-right: auto;">
+                    <h4 style="margin-bottom: 0.5rem;">How it works:</h4>
+                    <ul style="text-align: left; color: var(--text-secondary); font-size: 0.9rem;">
+                        <li>Speak naturally about any topic</li>
+                        <li>Get real-time feedback on your English</li>
+                        <li>AI adapts to your level</li>
+                        <li>End session anytime to see your scores</li>
+                    </ul>
+                </div>
+
+                <button class="btn btn-primary btn-lg" onclick="startFreeTalk()">
+                    🎤 Start Talking
+                </button>
+
+                <p style="color: var(--text-muted); font-size: 0.75rem; margin-top: 1rem;">
+                    Make sure to configure your API key in Settings first
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { checkAuth } from '../js/app.js';
+        import '../js/speaking.js';
+
+        if (!checkAuth()) {
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+
+</html>

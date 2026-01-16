@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - FluentAI</title>
+    <link rel="stylesheet" href="../../css/main.css">
+    <link rel="stylesheet" href="../../css/components.css">
+    <link rel="stylesheet" href="../../css/themes.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="../dashboard.html" class="logo">
+                    <span class="logo-icon">🎓</span>
+                    <span class="logo-text">FluentAI</span>
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Admin</div>
+                    <a href="dashboard.html" class="nav-item active">
+                        <span class="icon">📊</span>
+                        <span>Statistics</span>
+                    </a>
+                    <a href="content.html" class="nav-item">
+                        <span class="icon">📝</span>
+                        <span>Content</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <a href="../dashboard.html" class="nav-item">
+                        <span class="icon">🏠</span>
+                        <span>Back to App</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+        
+        <main class="main-content">
+            <div class="top-bar">
+                <div class="page-title">
+                    <h1>📊 Admin Dashboard</h1>
+                </div>
+            </div>
+            
+            <!-- User Stats -->
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem;">
+                <div class="stat-card">
+                    <div class="icon">👥</div>
+                    <div>
+                        <div class="stat-value" id="total-users">-</div>
+                        <div class="stat-label">Total Users</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon">📈</div>
+                    <div>
+                        <div class="stat-value" id="active-users">-</div>
+                        <div class="stat-label">Active (7d)</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon">🆕</div>
+                    <div>
+                        <div class="stat-value" id="new-users">-</div>
+                        <div class="stat-label">New (7d)</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon">📚</div>
+                    <div>
+                        <div class="stat-value" id="total-lessons">-</div>
+                        <div class="stat-label">Lessons Done</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem;">
+                <div>
+                    <!-- Daily Activity Chart -->
+                    <div class="card" style="margin-bottom: 1.5rem;">
+                        <h3 style="margin-bottom: 1rem;">Daily Activity (Last 7 days)</h3>
+                        <div id="activity-chart" style="display: flex; align-items: flex-end; justify-content: space-between; height: 200px;">
+                        </div>
+                    </div>
+                    
+                    <!-- Content Stats -->
+                    <div class="card">
+                        <h3 style="margin-bottom: 1rem;">Content Statistics</h3>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                            <div style="text-align: center; padding: 1rem; background: var(--bg-secondary); border-radius: var(--radius-lg);">
+                                <div style="font-size: 2rem; font-weight: 700; color: var(--primary);" id="content-packs">-</div>
+                                <div style="color: var(--text-muted); font-size: 0.875rem;">Lesson Packs</div>
+                            </div>
+                            <div style="text-align: center; padding: 1rem; background: var(--bg-secondary); border-radius: var(--radius-lg);">
+                                <div style="font-size: 2rem; font-weight: 700; color: var(--primary);" id="content-lessons">-</div>
+                                <div style="color: var(--text-muted); font-size: 0.875rem;">Lessons</div>
+                            </div>
+                            <div style="text-align: center; padding: 1rem; background: var(--bg-secondary); border-radius: var(--radius-lg);">
+                                <div style="font-size: 2rem; font-weight: 700; color: var(--primary);" id="content-questions">-</div>
+                                <div style="color: var(--text-muted); font-size: 0.875rem;">Questions</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <!-- Level Distribution -->
+                    <div class="card" style="margin-bottom: 1.5rem;">
+                        <h3 style="margin-bottom: 1rem;">User Levels</h3>
+                        <div id="level-distribution">
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Stats -->
+                    <div class="card">
+                        <h3 style="margin-bottom: 1rem;">Learning Stats</h3>
+                        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--text-muted);">Avg Score</span>
+                                <span style="font-weight: 600;" id="avg-score">-</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--text-muted);">Generated at</span>
+                                <span style="font-size: 0.875rem;" id="generated-at">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script type="module">
+        import { api } from '../../js/api.js';
+        import { toast, checkAuth, formatNumber } from '../../js/app.js';
+        
+        if (!checkAuth()) {
+            window.location.href = '../login.html';
+        }
+        
+        const user = api.getUser();
+        if (user && user.role !== 'admin') {
+            window.location.href = '../dashboard.html';
+        }
+        
+        async function loadStats() {
+            try {
+                const stats = await api.getAdminStats();
+                
+                // User stats
+                document.getElementById('total-users').textContent = formatNumber(stats.users.total);
+                document.getElementById('active-users').textContent = formatNumber(stats.users.active_7d);
+                document.getElementById('new-users').textContent = formatNumber(stats.users.new_7d);
+                document.getElementById('total-lessons').textContent = formatNumber(stats.learning.total_lessons_completed);
+                document.getElementById('avg-score').textContent = stats.learning.average_score + '%';
+                
+                // Content stats
+                document.getElementById('content-packs').textContent = stats.content.lesson_packs;
+                document.getElementById('content-lessons').textContent = stats.content.lessons;
+                document.getElementById('content-questions').textContent = stats.content.questions;
+                
+                // Time
+                document.getElementById('generated-at').textContent = new Date(stats.generated_at).toLocaleTimeString();
+                
+                // Activity chart
+                renderActivityChart(stats.daily_activity);
+                
+                // Level distribution
+                renderLevelDistribution(stats.users.level_distribution);
+                
+            } catch (error) {
+                toast.error('Failed to load statistics');
+            }
+        }
+        
+        function renderActivityChart(activity) {
+            const container = document.getElementById('activity-chart');
+            const maxUsers = Math.max(...activity.map(d => d.users), 1);
+            
+            container.innerHTML = activity.map(day => {
+                const height = (day.users / maxUsers) * 150;
+                return `
+                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                        <div style="font-size: 0.75rem; color: var(--primary);">${day.users}</div>
+                        <div style="width: 30px; height: ${height}px; background: var(--primary); border-radius: var(--radius-sm);"></div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">${day.date.slice(5)}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function renderLevelDistribution(distribution) {
+            const container = document.getElementById('level-distribution');
+            const total = Object.values(distribution).reduce((a, b) => a + b, 0);
+            
+            const levels = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'Unassessed'];
+            
+            container.innerHTML = levels.map(level => {
+                const count = distribution[level] || 0;
+                const percent = total > 0 ? (count / total) * 100 : 0;
+                
+                return `
+                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                        <span style="width: 70px; font-size: 0.875rem;">${level}</span>
+                        <div style="flex: 1; height: 8px; background: var(--bg-secondary); border-radius: var(--radius-full);">
+                            <div style="width: ${percent}%; height: 100%; background: var(--primary); border-radius: var(--radius-full);"></div>
+                        </div>
+                        <span style="width: 30px; font-size: 0.75rem; text-align: right;">${count}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        loadStats();
+    </script>
+</body>
+</html>

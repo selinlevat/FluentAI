@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FluentAI - AI-Powered Language Learning</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body class="landing-page">
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <span class="logo-text">FluentAI</span>
+            </a>
+            <div class="nav-links">
+                <a href="pages/login.html" class="btn btn-ghost">Log In</a>
+                <a href="pages/register.html" class="btn btn-primary">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    Learn English with
+                    <span class="gradient-text">AI-Powered</span>
+                    Personalization
+                </h1>
+                <p class="hero-subtitle">
+                    Master English through adaptive lessons, real-time AI conversations,
+                    and personalized learning paths tailored to your level.
+                </p>
+                <div class="hero-cta">
+                    <a href="pages/register.html" class="btn btn-primary btn-lg">
+                        Start Learning Free
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                    </a>
+                    <a href="#features" class="btn btn-ghost btn-lg">See How It Works</a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-number">10K+</span>
+                        <span class="stat-label">Active Learners</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">500+</span>
+                        <span class="stat-label">Lessons</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">A1-C2</span>
+                        <span class="stat-label">All Levels</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="composition-wrapper">
+                    <div class="composition-bg"></div>
+
+                    <!-- Left: AI Chat -->
+                    <div class="comp-chat floating-slow">
+                        <div class="chat-card">
+                            <div class="chat-header">
+                                <div class="chat-avatar-circle"></div>
+                                <div class="chat-info">
+                                    <span class="chat-name">AI Tutor</span>
+                                    <span class="chat-status">Online</span>
+                                </div>
+                            </div>
+                            <div class="chat-body">
+                                <div class="msg ai">That's a great answer!</div>
+                                <div class="msg user">My English is improving.</div>
+                                <div class="audio-wave">
+                                    <span></span><span></span><span></span><span></span><span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Center: Student -->
+                    <div class="comp-center">
+                        <div class="student-avatar">
+                            <img src="https://api.dicebear.com/9.x/avataaars/svg?seed=Eden&backgroundColor=b6e3f4&clothing=hoodie&clothingColor=3c4f76&eyes=happy&mouth=smile&eyebrows=default"
+                                alt="Student">
+                        </div>
+                        <div class="skill-badge grammar">Grammar</div>
+                        <div class="skill-badge vocab">Vocabulary</div>
+                    </div>
+
+                    <!-- Right: Stats -->
+                    <div class="comp-stats floating-delayed">
+                        <div class="stats-card">
+                            <div class="stats-bars">
+                                <div class="bar" style="--h: 40%"></div>
+                                <div class="bar" style="--h: 70%"></div>
+                                <div class="bar" style="--h: 55%"></div>
+                                <div class="bar active" style="--h: 90%"></div>
+                            </div>
+                            <div class="stats-label">Weekly Progress</div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom: Path -->
+                    <div class="comp-path">
+                        <svg viewBox="0 0 400 100" class="path-svg">
+                            <path d="M0,80 C100,80 100,20 200,20 C300,20 300,80 400,80" fill="none" stroke="#e2e8f0"
+                                stroke-width="4" stroke-dasharray="8 8" />
+                            <circle cx="0" cy="80" r="6" fill="#10b981" />
+                            <circle cx="200" cy="20" r="6" fill="#3b82f6" />
+                            <circle cx="400" cy="80" r="6" fill="#f59e0b" />
+                            <circle cx="0" cy="0" r="8" fill="#10b981">
+                                <animateMotion dur="4s" repeatCount="indefinite"
+                                    path="M0,80 C100,80 100,20 200,20 C300,20 300,80 400,80" />
+                            </circle>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="features">
+            <h2 class="section-title">Everything You Need to Master English</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>Smart Assessment</h3>
+                    <p>Take our placement test to find your CEFR level (A1-C2) and get a personalized learning path.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Daily Lessons</h3>
+                    <p>Bite-sized lessons with varied question types: MCQ, gap-fill, matching, and more.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Grammar Sprint</h3>
+                    <p>Challenge yourself with timed grammar exercises. 20 seconds per question!</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Word Sprint+</h3>
+                    <p>Build vocabulary fast with our 30-second word challenge mini-game.</p>
+                </div>
+                <div class="feature-card featured">
+                    <h3>AI Speaking Practice</h3>
+                    <p>Practice conversations with AI. Get instant feedback on fluency, grammar, and vocabulary.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Smart Review</h3>
+                    <p>AI-powered review mode focuses on your weak areas to maximize learning efficiency.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta-section">
+            <div class="cta-content">
+                <h2>Ready to Start Your English Journey?</h2>
+                <p>Join thousands of learners improving their English every day.</p>
+                <a href="pages/register.html" class="btn btn-primary btn-lg">Create Free Account</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <span class="logo-text">FluentAI</span>
+                <p>AI-Powered Language Learning Platform</p>
+            </div>
+            <div class="footer-links">
+                <a href="#">About</a>
+                <a href="#">Privacy</a>
+                <a href="#">Terms</a>
+                <a href="#">Contact</a>
+            </div>
+            <p class="footer-copy">© 2024 FluentAI. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/app.js" type="module"></script>
+</body>
+
+</html>

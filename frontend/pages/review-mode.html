@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Mode - FluentAI</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/themes.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="lesson-page">
+        <div class="lesson-header">
+            <a href="dashboard.html" class="lesson-back">
+                ← Back
+            </a>
+            <div class="lesson-info">
+                <h2>🔄 Review Mode</h2>
+                <p style="color: var(--text-muted);">Practice your weak areas</p>
+            </div>
+            <button class="btn btn-ghost" id="exit-btn" onclick="exitReview()" style="display: none;">
+                Exit & Save
+            </button>
+        </div>
+        
+        <div class="lesson-progress-bar">
+            <div class="progress-bar lg">
+                <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+            </div>
+        </div>
+        
+        <div id="review-container">
+            <div style="text-align: center; padding: 3rem;">
+                <div class="loading-spinner" style="margin: 0 auto;"></div>
+                <p style="margin-top: 1rem; color: var(--text-muted);">Generating personalized review...</p>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module">
+        import { api } from '../js/api.js';
+        import { toast, loading, QuestionRenderer, checkAuth } from '../js/app.js';
+        
+        if (!checkAuth()) {
+            window.location.href = 'login.html';
+        }
+        
+        let questions = [];
+        let currentIndex = 0;
+        let answers = [];
+        let questionRenderer = null;
+        
+        async function loadReview() {
+            try {
+                const data = await api.generateReview();
+                questions = data.questions;
+                
+                if (questions.length === 0 || data.message) {
+                    showEmptyState(data.message);
+                    return;
+                }
+                
+                document.getElementById('exit-btn').style.display = 'block';
+                questionRenderer = new QuestionRenderer(document.getElementById('review-container'));
+                renderQuestion();
+                
+            } catch (error) {
+                toast.error('Failed to load review');
+            }
+        }
+        
+        function showEmptyState(message) {
+            document.getElementById('review-container').innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">✨</div>
+                    <h3>No Review Needed!</h3>
+                    <p>${message || 'Complete more lessons to get personalized review questions.'}</p>
+                    <a href="daily-lesson.html" class="btn btn-primary" style="margin-top: 1rem;">
+                        Start a Lesson
+                    </a>
+                </div>
+            `;
+        }
+        
+        function renderQuestion() {
+            if (currentIndex >= questions.length) {
+                submitReview(false);
+                return;
+            }
+            
+            const question = questions[currentIndex];
+            questionRenderer.render(question, currentIndex, questions.length, null);
+            
+            const progress = (currentIndex / questions.length) * 100;
+            document.getElementById('progress-fill').style.width = `${progress}%`;
+        }
+        
+        window.handleAnswer = function(answer) {
+            const question = questions[currentIndex];
+            questionRenderer.selectAnswer(answer);
+            
+            answers.push({
+                question_id: question.id,
+                user_answer: answer
+            });
+            
+            let correctAnswer = question.correct_answer;
+            if (typeof correctAnswer === 'string') {
+                try { correctAnswer = JSON.parse(correctAnswer); } catch {}
+            }
+            
+            // Normalize for comparison
+            const isCorrect = String(answer).toLowerCase().trim() === String(correctAnswer).toLowerCase().trim();
+            
+            // Ensure correctAnswer matches one of the options for highlighting
+            if (question.options) {
+                const matchingOption = question.options.find(opt => 
+                    String(opt).toLowerCase().trim() === String(correctAnswer).toLowerCase().trim()
+                );
+                if (matchingOption) {
+                    correctAnswer = matchingOption;
+                }
+            }
+            
+            // Show result with red/green coloring (like Grammar Sprint)
+            questionRenderer.showResult(isCorrect, correctAnswer);
+            
+            setTimeout(() => {
+                currentIndex++;
+                renderQuestion();
+            }, 1500);
+        };
+        
+        window.exitReview = function() {
+            if (answers.length > 0) {
+                submitReview(true);
+            } else {
+                window.location.href = 'dashboard.html';
+            }
+        };
+        
+        async function submitReview(partial) {
+            loading.show();
+            
+            try {
+                const result = await api.submitReview(answers, partial);
+                showResults(result);
+            } catch (error) {
+                toast.error('Failed to submit review');
+            } finally {
+                loading.hide();
+            }
+        }
+        
+        function showResults(result) {
+            document.getElementById('exit-btn').style.display = 'none';
+            
+            document.getElementById('review-container').innerHTML = `
+                <div class="result-screen">
+                    <div class="result-icon">${result.score >= 70 ? '🎉' : '💪'}</div>
+                    <div class="result-score">${result.score}%</div>
+                    <div class="result-message">
+                        ${result.partial ? 'Progress saved!' : (result.score >= 70 ? 'Great review session!' : 'Keep practicing!')}
+                    </div>
+                    
+                    <div class="result-stats">
+                        <div class="result-stat">
+                            <div class="result-stat-value">${result.correct_count}/${result.total_questions}</div>
+                            <div class="result-stat-label">Correct</div>
+                        </div>
+                        <div class="result-stat">
+                            <div class="result-stat-value">+${result.xp_earned}</div>
+                            <div class="result-stat-label">XP</div>
+                        </div>
+                    </div>
+                    
+                    ${result.analysis && result.analysis.weak_skills && result.analysis.weak_skills.length > 0 ? `
+                        <div style="background: var(--bg-secondary); border-radius: var(--radius-lg); padding: 1rem; margin: 1.5rem auto; max-width: 300px;">
+                            <p style="font-size: 0.875rem; color: var(--text-secondary);">
+                                <strong>Focus areas:</strong> ${result.analysis.weak_skills.join(', ')}
+                            </p>
+                        </div>
+                    ` : ''}
+                    
+                    <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center;">
+                        <a href="dashboard.html" class="btn btn-secondary">Dashboard</a>
+                        <button onclick="location.reload()" class="btn btn-primary">Review Again</button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('progress-fill').style.width = '100%';
+        }
+        
+        loadReview();
+    </script>
+</body>
+</html>

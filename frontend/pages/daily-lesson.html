@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Lesson - FluentAI</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/themes.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .card-viewer {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .info-card {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            text-align: center;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .card-content {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-example {
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            font-style: italic;
+            color: var(--primary);
+        }
+
+        .card-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+            gap: 1rem;
+        }
+
+        .card-nav button {
+            flex: 1;
+        }
+
+        .card-progress {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-top: 1rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="lesson-page">
+        <div class="lesson-header">
+            <a href="dashboard.html" class="lesson-back">
+                ← Back
+            </a>
+            <div class="lesson-info">
+                <h2>📚 Daily Lesson</h2>
+                <p style="color: var(--text-muted);">Learn something new today!</p>
+            </div>
+        </div>
+
+        <div class="lesson-progress-bar">
+            <div class="progress-bar lg">
+                <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <div id="lesson-container">
+            <div style="text-align: center; padding: 3rem;">
+                <div class="loading-spinner" style="margin: 0 auto;"></div>
+                <p style="margin-top: 1rem; color: var(--text-muted);">Loading lesson cards...</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { api } from '../js/api.js';
+        import { checkAuth, toast } from '../js/app.js';
+
+        if (!checkAuth()) {
+            window.location.href = 'login.html';
+        }
+
+        let cards = [];
+        let currentIndex = 0;
+
+        async function loadCards() {
+            try {
+                const data = await api.getDailyCards();
+                cards = data.cards || [];
+
+                if (cards.length === 0) {
+                    showEmptyState();
+                    return;
+                }
+
+                renderCard();
+            } catch (error) {
+                console.error('Failed to load cards:', error);
+                toast.error('Failed to load lesson cards');
+            }
+        }
+
+        function showEmptyState() {
+            document.getElementById('lesson-container').innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">📭</div>
+                    <h3>No Cards Available</h3>
+                    <p style="color: var(--text-muted);">There are no lesson cards for your level yet.</p>
+                    <a href="dashboard.html" class="btn btn-primary" style="margin-top: 1rem;">
+                        Back to Dashboard
+                    </a>
+                </div>
+            `;
+        }
+
+        function renderCard() {
+            const card = cards[currentIndex];
+            const progress = ((currentIndex + 1) / cards.length) * 100;
+            document.getElementById('progress-fill').style.width = `${progress}%`;
+
+            const isFirst = currentIndex === 0;
+            const isLast = currentIndex === cards.length - 1;
+
+            document.getElementById('lesson-container').innerHTML = `
+                <div class="card-viewer">
+                    <div class="info-card">
+                        <div class="card-icon">📖</div>
+                        <div class="card-title">${card.title}</div>
+                        <div class="card-content">${card.content}</div>
+                        ${card.example ? `<div class="card-example">${card.example}</div>` : ''}
+                    </div>
+                    
+                    <div class="card-nav">
+                        <button class="btn btn-secondary" onclick="prevCard()" ${isFirst ? 'disabled' : ''}>
+                            ← Previous
+                        </button>
+                        ${isLast ? `
+                            <button class="btn btn-primary" onclick="finishLesson()">
+                                ✓ Finish
+                            </button>
+                        ` : `
+                            <button class="btn btn-primary" onclick="nextCard()">
+                                Next →
+                            </button>
+                        `}
+                    </div>
+                    
+                    <div class="card-progress">
+                        Card ${currentIndex + 1} of ${cards.length}
+                    </div>
+                </div>
+            `;
+        }
+
+        window.nextCard = function () {
+            if (currentIndex < cards.length - 1) {
+                currentIndex++;
+                renderCard();
+            }
+        };
+
+        window.prevCard = function () {
+            if (currentIndex > 0) {
+                currentIndex--;
+                renderCard();
+            }
+        };
+
+        window.finishLesson = function () {
+            document.getElementById('lesson-container').innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">🎉</div>
+                    <h3>Lesson Complete!</h3>
+                    <p style="color: var(--text-muted);">Great job! You've reviewed all ${cards.length} cards.</p>
+                    <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center;">
+                        <a href="dashboard.html" class="btn btn-secondary">Dashboard</a>
+                        <button onclick="location.reload()" class="btn btn-primary">Review Again</button>
+                    </div>
+                </div>
+            `;
+            document.getElementById('progress-fill').style.width = '100%';
+        };
+
+        loadCards();
+    </script>
+</body>
+
+</html>

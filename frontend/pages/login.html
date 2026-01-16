@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log In - LinguaLearn</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/themes.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="auth-page">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <a href="../index.html" class="logo">
+                    <span class="logo-text">FluentAI</span>
+                </a>
+                <h1>Welcome Back!</h1>
+                <p>Continue your English learning journey</p>
+            </div>
+            
+            <form id="login-form">
+                <div class="form-group">
+                    <label class="form-label" for="email">Email</label>
+                    <input type="email" id="email" class="form-input" placeholder="your@email.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="password">Password</label>
+                    <input type="password" id="password" class="form-input" placeholder="••••••••" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">
+                    Log In
+                </button>
+            </form>
+            
+            <div class="auth-footer">
+                <p>Don't have an account? <a href="register.html">Sign up</a></p>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module">
+        import { api } from '../js/api.js';
+        import { toast, loading } from '../js/app.js';
+        
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const btn = e.target.querySelector('button[type="submit"]');
+            
+            try {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="loading-spinner" style="width:20px;height:20px;border-width:2px;"></span>';
+                
+                const data = await api.login(email, password);
+                
+                if (!data.user.cefr_level) {
+                    window.location.href = 'placement-test.html';
+                } else {
+                    window.location.href = 'dashboard.html';
+                }
+            } catch (error) {
+                toast.error(error.message || 'Login failed');
+                btn.disabled = false;
+                btn.textContent = 'Log In';
+            }
+        });
+    </script>
+</body>
+</html>

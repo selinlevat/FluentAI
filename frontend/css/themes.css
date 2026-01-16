@@ -1,0 +1,557 @@
+/* FluentAI - Theme Overrides & App-specific Styles */
+
+/* App Layout (for logged-in pages) */
+.app-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 260px;
+    background: var(--bg-card);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    height: 100vh;
+    z-index: 50;
+}
+
+.sidebar-header {
+    padding: var(--space-lg);
+    border-bottom: 1px solid var(--border);
+}
+
+.sidebar-nav {
+    flex: 1;
+    padding: var(--space-md);
+    overflow-y: auto;
+}
+
+.nav-section {
+    margin-bottom: var(--space-lg);
+}
+
+.nav-section-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    padding: var(--space-sm) var(--space-md);
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md);
+    border-radius: var(--radius-lg);
+    color: var(--text-secondary);
+    transition: all var(--transition-fast);
+}
+
+.nav-item:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.nav-item.active {
+    background: var(--primary-bg);
+    color: var(--primary);
+    font-weight: 500;
+}
+
+.nav-item .icon {
+    font-size: 1.25rem;
+    width: 24px;
+    text-align: center;
+}
+
+.sidebar-footer {
+    padding: var(--space-md);
+    border-top: 1px solid var(--border);
+}
+
+.main-content {
+    flex: 1;
+    margin-left: 260px;
+    padding: var(--space-xl);
+    background: var(--bg-primary);
+}
+
+/* Top Bar */
+.top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-xl);
+}
+
+.page-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.page-title h1 {
+    font-size: 1.5rem;
+}
+
+.user-stats {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+}
+
+/* Dashboard Grid */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: var(--space-xl);
+}
+
+.dashboard-main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+}
+
+.dashboard-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+}
+
+/* Stats Cards Row */
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-md);
+}
+
+.stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.stat-card .icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    border-radius: var(--radius-lg);
+    background: var(--primary-bg);
+}
+
+.stat-card.streak .icon {
+    background: linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(234, 88, 12, 0.1));
+}
+
+.stat-card.xp .icon {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(245, 158, 11, 0.1));
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+/* Daily Goal Widget */
+.daily-goal {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border-radius: var(--radius-xl);
+    padding: var(--space-xl);
+    color: white;
+}
+
+.daily-goal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-lg);
+}
+
+.daily-goal h3 {
+    font-size: 1rem;
+    opacity: 0.9;
+}
+
+.daily-goal-progress {
+    margin-bottom: var(--space-md);
+}
+
+.daily-goal .progress-bar {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.daily-goal .progress-fill {
+    background: white;
+}
+
+.daily-goal-stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    opacity: 0.9;
+}
+
+/* Weekly Chart */
+.weekly-chart {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    height: 120px;
+    padding: var(--space-md) 0;
+}
+
+.chart-bar {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.chart-bar .bar {
+    width: 24px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-normal);
+    position: relative;
+}
+
+.chart-bar .bar .fill {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--primary);
+    border-radius: var(--radius-sm);
+    transition: height var(--transition-normal);
+}
+
+.chart-bar.active .bar .fill {
+    background: linear-gradient(to top, var(--primary), var(--primary-light));
+}
+
+.chart-bar .day {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.chart-bar.today .day {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+/* Lesson Pack Card */
+.pack-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    padding: var(--space-lg);
+    background: var(--bg-card);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-xl);
+    cursor: pointer;
+    transition: all var(--transition-normal);
+}
+
+.pack-card:hover {
+    border-color: var(--primary);
+    box-shadow: var(--shadow-md);
+}
+
+.pack-card.locked {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.pack-card.locked:hover {
+    border-color: var(--border);
+    box-shadow: none;
+}
+
+.pack-icon {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+}
+
+.pack-info {
+    flex: 1;
+}
+
+.pack-title {
+    font-weight: 600;
+    margin-bottom: var(--space-xs);
+}
+
+.pack-meta {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.pack-progress {
+    width: 100px;
+}
+
+/* Auth Pages */
+.auth-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-xl);
+    background: linear-gradient(135deg, var(--bg-primary), var(--primary-bg));
+}
+
+.auth-container {
+    width: 100%;
+    max-width: 420px;
+}
+
+.auth-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-2xl);
+    box-shadow: var(--shadow-xl);
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: var(--space-2xl);
+}
+
+.auth-header .logo {
+    justify-content: center;
+    margin-bottom: var(--space-lg);
+}
+
+.auth-header h1 {
+    font-size: 1.5rem;
+    margin-bottom: var(--space-sm);
+}
+
+.auth-header p {
+    color: var(--text-muted);
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: var(--space-xl);
+    padding-top: var(--space-xl);
+    border-top: 1px solid var(--border);
+}
+
+.auth-footer a {
+    color: var(--primary);
+    font-weight: 500;
+}
+
+/* Lesson Page */
+.lesson-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--space-xl);
+}
+
+.lesson-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-xl);
+}
+
+.lesson-back {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    color: var(--text-secondary);
+}
+
+.lesson-back:hover {
+    color: var(--text-primary);
+}
+
+.lesson-info {
+    text-align: center;
+}
+
+.lesson-progress-bar {
+    margin-bottom: var(--space-2xl);
+}
+
+/* Result Screen */
+.result-screen {
+    text-align: center;
+    padding: var(--space-3xl);
+}
+
+.result-icon {
+    font-size: 5rem;
+    margin-bottom: var(--space-lg);
+}
+
+.result-score {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: var(--space-md);
+}
+
+.result-message {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-2xl);
+}
+
+.result-stats {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-2xl);
+    margin-bottom: var(--space-2xl);
+}
+
+.result-stat {
+    text-align: center;
+}
+
+.result-stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.result-stat-label {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+/* Skill Bars */
+.skill-bars {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.skill-bar-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.skill-name {
+    width: 100px;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.skill-bar {
+    flex: 1;
+    height: 8px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.skill-bar-fill {
+    height: 100%;
+    border-radius: var(--radius-full);
+    transition: width var(--transition-slow);
+}
+
+.skill-bar-fill.grammar { background: #8b5cf6; }
+.skill-bar-fill.vocabulary { background: var(--primary); }
+.skill-bar-fill.listening { background: #3b82f6; }
+.skill-bar-fill.speaking { background: var(--accent); }
+
+.skill-percent {
+    width: 40px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-align: right;
+}
+
+/* API Key Settings */
+.api-key-section {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    margin-bottom: var(--space-lg);
+}
+
+.api-key-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-md);
+}
+
+.api-key-status {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: 0.875rem;
+}
+
+.api-key-status.configured {
+    color: var(--success);
+}
+
+.api-key-status.not-configured {
+    color: var(--text-muted);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1024px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .sidebar {
+        transform: translateX(-100%);
+        transition: transform var(--transition-normal);
+    }
+    
+    .sidebar.open {
+        transform: translateX(0);
+    }
+    
+    .main-content {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 640px) {
+    .stats-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .options-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .score-display {
+        flex-direction: column;
+    }
+}

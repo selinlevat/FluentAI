@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - FluentAI</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/themes.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="dashboard.html" class="logo">
+                    <span class="logo-icon">🎓</span>
+                    <span class="logo-text">FluentAI</span>
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <a href="dashboard.html" class="nav-item">
+                        <span class="icon">🏠</span>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="settings.html" class="nav-item active">
+                        <span class="icon">⚙️</span>
+                        <span>Settings</span>
+                    </a>
+                </div>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="#" class="nav-item" data-action="logout">
+                    <span class="icon">🚪</span>
+                    <span>Log Out</span>
+                </a>
+            </div>
+        </aside>
+        
+        <main class="main-content">
+            <div class="top-bar">
+                <div class="page-title">
+                    <h1>Settings</h1>
+                </div>
+            </div>
+            
+            <div style="max-width: 700px;">
+                <!-- Profile Settings -->
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <h3 style="margin-bottom: 1.5rem;">Profile</h3>
+                    <form id="profile-form">
+                        <div class="form-group">
+                            <label class="form-label">Name</label>
+                            <input type="text" id="profile-name" class="form-input" placeholder="Your name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" id="profile-email" class="form-input" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Daily Goal (minutes)</label>
+                            <select id="daily-goal" class="form-input">
+                                <option value="5">5 minutes</option>
+                                <option value="10">10 minutes</option>
+                                <option value="15" selected>15 minutes</option>
+                                <option value="20">20 minutes</option>
+                                <option value="30">30 minutes</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                </div>
+                
+                <!-- API Keys Section -->
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <h3 style="margin-bottom: 0.5rem;">🤖 AI API Keys</h3>
+                    <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.5rem;">
+                        Add your API keys to enable AI-powered speaking practice. Your keys are encrypted and stored securely.
+                    </p>
+                    
+                    <!-- OpenAI -->
+                    <div class="api-key-section">
+                        <div class="api-key-header">
+                            <div>
+                                <strong>OpenAI (GPT-4 + Whisper)</strong>
+                                <p style="font-size: 0.75rem; color: var(--text-muted);">For speech analysis and conversation</p>
+                            </div>
+                            <span class="api-key-status" id="openai-status">
+                                Not configured
+                            </span>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <input type="password" id="openai-key" class="form-input" placeholder="sk-..." style="flex: 1;">
+                            <button class="btn btn-secondary" onclick="saveAPIKey('openai')">Save</button>
+                            <button class="btn btn-ghost" onclick="testAPIKey('openai')">Test</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Gemini -->
+                    <div class="api-key-section">
+                        <div class="api-key-header">
+                            <div>
+                                <strong>Google Gemini</strong>
+                                <p style="font-size: 0.75rem; color: var(--text-muted);">Alternative AI provider</p>
+                            </div>
+                            <span class="api-key-status" id="gemini-status">
+                                Not configured
+                            </span>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <input type="password" id="gemini-key" class="form-input" placeholder="AI..." style="flex: 1;">
+                            <button class="btn btn-secondary" onclick="saveAPIKey('gemini')">Save</button>
+                            <button class="btn btn-ghost" onclick="testAPIKey('gemini')">Test</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Preferred Provider -->
+                    <div style="margin-top: 1rem;">
+                        <label class="form-label">Preferred AI Provider</label>
+                        <select id="preferred-ai" class="form-input" style="max-width: 200px;">
+                            <option value="openai">OpenAI</option>
+                            <option value="gemini">Google Gemini</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Notifications -->
+                <div class="card">
+                    <h3 style="margin-bottom: 1.5rem;">Notifications</h3>
+                    <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;">
+                        <input type="checkbox" id="notifications-enabled" checked>
+                        <span>Enable reminder notifications</span>
+                    </label>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script type="module">
+        import { api } from '../js/api.js';
+        import { toast, loading, checkAuth, initSidebar } from '../js/app.js';
+        
+        if (!checkAuth()) {
+            window.location.href = 'login.html';
+        }
+        
+        initSidebar();
+        
+        // Load profile
+        async function loadProfile() {
+            try {
+                const data = await api.getProfile();
+                
+                document.getElementById('profile-name').value = data.name;
+                document.getElementById('profile-email').value = data.email;
+                document.getElementById('daily-goal').value = data.settings.daily_goal_minutes;
+                document.getElementById('notifications-enabled').checked = data.settings.notifications_enabled;
+                document.getElementById('preferred-ai').value = data.settings.preferred_ai;
+                
+                // Update API key status
+                updateKeyStatus('openai', data.api_keys.openai_configured, data.api_keys.openai_masked);
+                updateKeyStatus('gemini', data.api_keys.gemini_configured, data.api_keys.gemini_masked);
+                
+            } catch (error) {
+                toast.error('Failed to load settings');
+            }
+        }
+        
+        function updateKeyStatus(provider, configured, masked) {
+            const status = document.getElementById(`${provider}-status`);
+            if (configured) {
+                status.textContent = `Configured (${masked})`;
+                status.classList.add('configured');
+                status.classList.remove('not-configured');
+            } else {
+                status.textContent = 'Not configured';
+                status.classList.remove('configured');
+                status.classList.add('not-configured');
+            }
+        }
+        
+        // Save profile
+        document.getElementById('profile-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            try {
+                await api.updateProfile({
+                    name: document.getElementById('profile-name').value,
+                    daily_goal_minutes: parseInt(document.getElementById('daily-goal').value),
+                    notifications_enabled: document.getElementById('notifications-enabled').checked
+                });
+                toast.success('Profile updated!');
+            } catch (error) {
+                toast.error('Failed to update profile');
+            }
+        });
+        
+        // Save API Key
+        window.saveAPIKey = async function(provider) {
+            const input = document.getElementById(`${provider}-key`);
+            const key = input.value.trim();
+            
+            if (!key) {
+                toast.warning('Please enter an API key');
+                return;
+            }
+            
+            try {
+                const data = {
+                    preferred_ai: document.getElementById('preferred-ai').value
+                };
+                data[`${provider}_api_key`] = key;
+                
+                await api.updateAPIKeys(data);
+                toast.success(`${provider.charAt(0).toUpperCase() + provider.slice(1)} API key saved!`);
+                input.value = '';
+                loadProfile();
+            } catch (error) {
+                toast.error('Failed to save API key');
+            }
+        };
+        
+        // Test API Key
+        window.testAPIKey = async function(provider) {
+            try {
+                loading.show();
+                const result = await api.testAPIKey(provider);
+                
+                if (result.success) {
+                    toast.success(result.message);
+                } else {
+                    toast.error(result.error);
+                }
+            } catch (error) {
+                toast.error('Failed to test API key');
+            } finally {
+                loading.hide();
+            }
+        };
+        
+        // Preferred AI change
+        document.getElementById('preferred-ai').addEventListener('change', async (e) => {
+            try {
+                await api.updateAPIKeys({
+                    preferred_ai: e.target.value
+                });
+                toast.success('Preferred AI updated');
+            } catch (error) {
+                toast.error('Failed to update preference');
+            }
+        });
+        
+        loadProfile();
+    </script>
+</body>
+</html>
